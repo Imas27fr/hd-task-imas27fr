@@ -14,16 +14,75 @@ export default function Replacement() {
             onSelect={setSelectedFilter}
         />
 
-        <div>
-            <Requests />
+        <div className={styles.parentBody}>
+            <Requests 
+            selectedFilter={selectedFilter}
+            />
+
+            <Request />
         </div>
 
 
         </main>
     )
 }
+export function Request() {
 
-export function Requests() {
+    return (
+        <>
+            <div className={styles['requestInfoBox']}>
+                <div className={styles.requestHeader}>
+                    <h2 className={styles.requestID}>Request REP-001</h2>
+                    <p>Requested</p>
+                </div>
+                <h3 className={styles.deviceID}>Pendant PND-0142</h3>
+                <p>Location: Melbourne - Site A</p>
+                <p>Recorded fault: Device fault</p>
+                <p>Offline since: 18 Oct 2026, 09:10</p>
+                <br></br>
+                <h4 className={styles.replacementProgress}>Replacement progress</h4>
+                <ProgressBar />
+
+                <RequestOption />
+            </div>
+        </>
+    )
+}
+
+export function ProgressBar() {
+    return (
+        <>
+            <div className={styles.steps}>
+                <div className={styles.stepFilled}></div>
+                <div className={styles.step}></div>
+                <div className={styles.step}></div>
+                <div className={styles.step}></div>
+            </div>
+            <div className={styles.stepsLabel}>
+                <p>Requested</p>
+                <p>Approved</p>
+                <p>In Progress</p>
+                <p>Delivered</p>
+            </div>
+        </>
+    )
+}
+
+export function RequestOption() {
+    const [selectedOption, setSelectedOption] = useState('Approve Request')
+
+    return (
+        <>
+            <div className={styles['requestOptions']}>
+                <button className={styles['rounded-box']}>Approve request</button>
+                <button className={styles['rounded-box']}>Reject request</button>
+            </div>
+        </>
+    )
+}
+
+export function Requests({selectedFilter} : Filter) {
+
     return (
         <>
             <div className={styles['requestsBox']}>
@@ -72,6 +131,10 @@ export function Requests() {
 
         </>
     )
+}
+
+type Filter = {
+    selectedFilter: string
 }
 
 type FiltersProps = {
