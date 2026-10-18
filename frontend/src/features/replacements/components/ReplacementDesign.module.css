@@ -5,6 +5,13 @@
   padding-bottom: 20px;
 }
 
+.heading2 {
+  color: #020202;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 10px;
+}
+
 .rounded-box {
     display: inline-block;
     padding-left: 3%;
@@ -33,4 +40,31 @@
     
     border-radius: 5px; 
     margin-right: 5px;
+}
+
+.requestsBox {
+    margin-top: 30px;
+    width: 60%;
+    height: 500px;
+    border: 1px solid #c9c9c9;
+}
+
+.requestsTable {
+    width: 100%;
+}
+
+.requestsTable th {
+    padding: 10px;
+    text-align: left;
+    background-color: rgb(240, 240, 240);
+    color: rgb(77, 76, 76);
+    font-size: small;
+}
+
+.requestsTable td {
+    padding: 10px;
+}
+
+.requestsTable tbody tr {
+    border: 1px solid #c9c9c9;
 }
