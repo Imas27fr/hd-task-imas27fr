@@ -1,7 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './ReplacementDesign.module.css'
+import {getFaultyDevices, getRequests} from '../hooks/useDevices'
+
+type Verdict = "Device fault" | "Network Outage" 
+
+type Device = {
+    DeviceID: string,
+    faultVerdict: Verdict,
+    datetime: Date,
+    location: string
+};
+
+type State = "Requested" | "Approved" | "In Progress" | "Delivered" | "Rejected";
+
+type Request = {
+    DeviceID: string,
+    datetime: Date,
+    Status: State
+}
 
 export default function Replacement() {
     const [selectedFilter, setSelectedFilter] = useState('All')
@@ -32,7 +51,7 @@ export function Request() {
         <>
             <div className={styles['requestInfoBox']}>
                 <div className={styles.requestHeader}>
-                    <h2 className={styles.requestID}>Request REP-001</h2>
+                    <h2 className={styles.requestID}>Request Information</h2>
                     <p>Requested</p>
                 </div>
                 <h3 className={styles.deviceID}>Pendant PND-0142</h3>
@@ -82,6 +101,39 @@ export function RequestOption() {
 }
 
 export function Requests({selectedFilter} : Filter) {
+    const [devices, setDevices] = useState<Device[]>([])
+    const [requests, setRequests] = useState<Request[]>([])
+
+    const { user, loading } = useAuth()
+
+    console.log('Authentication loading:', loading)
+    console.log('Signed-in user:', user?.uid)
+    console.log('Selected Filter:', selectedFilter)
+
+    useEffect(() => {
+        if (loading || !user) return
+
+        async function loadDevicesRequests() {
+            try {
+                const loadedDevices = await getFaultyDevices()
+                const loadedRequests = await getRequests()
+                setDevices(loadedDevices)
+                setRequests(loadedRequests)
+                console.log(loadedDevices)
+                console.log(loadedRequests)
+            } catch (error) {
+                console.error('Failed to load devices:', error)
+            }
+        }
+
+        loadDevicesRequests()
+        }, [loading, user, selectedFilter])
+    
+    const visibleRequests = requests.filter(
+        request =>
+            selectedFilter === 'All' ||
+            request.Status === selectedFilter
+    )
 
     return (
         <>
@@ -90,41 +142,27 @@ export function Requests({selectedFilter} : Filter) {
                 
                 <table className={styles.requestsTable}>
                     
-                    <tr>
-                        <th>Device</th>
-                        <th>Request</th>
-                        <th>Created</th>
-                        <th>Status</th>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Device</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    
                     
                     <tbody>
-                        <tr>
-                            <td>PND-0142</td>
-                            <td>REP-001</td>
-                            <td>18 Oct, 09:10</td>
-                            <td>Requested</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>PND-0188</td>
-                            <td>REP-002</td>
-                            <td>18 Oct, 09:10</td>
-                            <td>Requested</td>
-                        </tr>
-
-                        <tr>
-                            <td>PND-0205</td>
-                            <td>REP-003</td>
-                            <td>18 Oct, 09:10</td>
-                            <td>Approved</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>PND-0107</td>
-                            <td>REP-004</td>
-                            <td>18 Oct, 09:10</td>
-                            <td>Delivered</td>
-                        </tr>
+                        {
+                            visibleRequests.map(
+                                (request) => (
+                                    <tr key={request.DeviceID}>
+                                        <td>{request.DeviceID}</td>
+                                        <td>{request.datetime.toDateString()}{request.datetime.toTimeString()}</td>
+                                        <td>{request.Status}</td>
+                                    </tr>
+                                )
+                            )
+                        }
                     </tbody>
                 </table>
             </div>
