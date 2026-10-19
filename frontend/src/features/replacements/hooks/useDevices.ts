@@ -1,21 +1,20 @@
 
 import { getClientDb } from '@/lib/firebase/client'
 import { doc, setDoc, getDoc, collection, getDocs, query, where, Timestamp, QuerySnapshot, DocumentData } from 'firebase/firestore'
-import { Request } from '../components/ReplacementDesign';
 
 
-type Verdict = "Device fault" | "Network Outage" 
+export type Verdict = "Device fault" | "Network Outage" 
 
-type Device = {
+export type Device = {
     DeviceID: string,
     faultVerdict: Verdict,
     datetime: Date,
     location: string
 };
 
-type State = "Requested" | "Approved" | "In Progress" | "Delivered" | "Rejected";
+export type State = "Requested" | "Approved" | "In Progress" | "Delivered" | "Rejected";
 
-type Request = {
+export type Request = {
     DeviceID: string,
     datetime: Date,
     Status: State
