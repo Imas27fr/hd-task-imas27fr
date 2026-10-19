@@ -23,6 +23,62 @@ type Request = {
 
 const db = getClientDb()
 
+export async function getRequests(): Promise<Request[]> {
+
+    await createReplacementRequests();
+
+    const queryResults = query(
+        collection(db, "requests")
+    );
+
+    const snapshot = await getDocs(queryResults);
+
+    return getValidRequests(snapshot);
+}
+
+function getValidRequests(snapshot: QuerySnapshot<DocumentData>): Request[] {
+
+    const requests = snapshot.docs;
+
+    const validRequests: Request[] = [];
+
+    for (const requestSnapshot of requests) {
+        const request = requestSnapshot.data()
+
+        if (typeof request.DeviceID !== "string" || request.DeviceID.trim() === '') {
+            console.log("Invalid Device found. Skipping Device Request");
+            continue;
+        }
+        const deviceID = request.DeviceID
+
+        if (!(request.datetime instanceof Timestamp) || Number.isNaN(request.datetime.toDate().getTime())) {
+            console.log("Invalid Date Time. Skipping Device Request");
+            continue;
+        }
+        const date = request.datetime.toDate();
+        
+        if (typeof request.Status !== "string" || (request.Status !== 'Requested' && request.Status !== 'Approved' && request.Status !== 'In Progress' && request.Status !== 'Delivered' && request.Status !== 'Rejected')) {
+            console.log("Invalid Replacement Status. Skipping Device Request");
+            continue;
+        }
+        const status = request.Status;
+
+
+        const validRequest : Request = {
+            DeviceID: deviceID,
+            datetime: date,
+            Status: status
+        }
+
+        validRequests.push(validRequest);
+
+    }
+
+    return validRequests;
+
+}
+
+
 
 export async function createReplacementRequests(){
 
