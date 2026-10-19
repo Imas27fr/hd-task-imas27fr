@@ -20,11 +20,7 @@ export default function Replacement() {
 
     const { user, loading } = useAuth()
 
-
-    useEffect(() => {
-        if (loading || !user) return
-
-        async function loadDevicesRequests() {
+    async function loadDevicesRequests() {
             try {
                 const loadedDevices = await getFaultyDevices()
                 const loadedRequests = await getRequests()
@@ -34,6 +30,10 @@ export default function Replacement() {
                 console.error('Failed to load devices and requests:', error)
             }
         }
+
+
+    useEffect(() => {
+        if (loading || !user) return
 
         const unsubscribe = onSnapshot(collection(getClientDb(), "requests"),
 
@@ -53,7 +53,27 @@ export default function Replacement() {
             },
 
             (error) => {
-                console.error('Could not listen to db:', error)
+                console.error('Could not listen to requests db:', error)
+            }
+
+        )
+
+        return unsubscribe
+    }, [loading, user])
+
+    useEffect(() => {
+        if (loading || !user) return
+
+        const unsubscribe = onSnapshot(collection(getClientDb(), "devices"),
+
+            (snapshot) => {
+
+                loadDevicesRequests()
+                
+            },
+
+            (error) => {
+                console.error('Could not listen to devices db:', error)
             }
 
         )
