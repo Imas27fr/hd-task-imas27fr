@@ -1,6 +1,6 @@
 
 import { getClientDb } from '@/lib/firebase/client'
-import { doc, setDoc, getDoc, collection, getDocs, query, where, Timestamp, QuerySnapshot, DocumentData } from 'firebase/firestore'
+import { doc, setDoc, getDoc, collection, getDocs, updateDoc, query, where, Timestamp, QuerySnapshot, DocumentData } from 'firebase/firestore'
 
 
 export type Verdict = "Device fault" | "Network Outage" 
@@ -22,6 +22,13 @@ export type Request = {
 
 const db = getClientDb()
 
+export async function updateStatus(deviceID: string, Status: State): Promise<void> {
+
+    await updateDoc(doc(db, "requests", deviceID), { Status });
+    console.log("updated")
+
+}
+
 export async function getRequests(): Promise<Request[]> {
 
     await createReplacementRequests();
@@ -35,7 +42,7 @@ export async function getRequests(): Promise<Request[]> {
     return getValidRequests(snapshot);
 }
 
-function getValidRequests(snapshot: QuerySnapshot<DocumentData>): Request[] {
+export function getValidRequests(snapshot: QuerySnapshot<DocumentData>): Request[] {
 
     const requests = snapshot.docs;
 
