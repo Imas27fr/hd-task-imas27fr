@@ -16,7 +16,18 @@ export function RequestDetail({selectedDevice, selectedRequest} : selectedReq) {
             <div className={styles['requestInfoBox']}>
                 <div className={styles.requestHeader}>
                     <h2 className={styles.requestID}>Request Information</h2>
-                    <p>{selectedRequest?.Status}</p>
+                    <p>
+                        <span
+                            className={
+                            selectedRequest?.Status == "Requested"? styles.requestedBG : 
+                                (selectedRequest?.Status == "Approved"? styles.approvedBG : 
+                                    (selectedRequest?.Status == "In Progress"? styles.progressBG : 
+                                        (selectedRequest?.Status == "Delivered"? styles.approvedBG : styles.normalBG))) 
+                            }
+                        >
+                        {selectedRequest?.Status}
+                        </span>  
+                    </p>
                 </div>
                 <h3 className={styles.deviceID}>Pendant {selectedDevice?.DeviceID}</h3>
                 <p><b>Location:</b> {selectedDevice?.location}</p>
@@ -74,7 +85,7 @@ export function RequestOption({selectedRequest} : selectedReqOnly) {
             <div className={styles['requestOptions']}>
                 {selectedRequest.Status === 'Requested' && (
                     <>
-                        <button className={styles['rounded-box']}>
+                        <button className={styles['rounded-box-is-active']}>
                             Approve request
                         </button>
 
@@ -86,7 +97,7 @@ export function RequestOption({selectedRequest} : selectedReqOnly) {
 
                 {selectedRequest.Status === 'Approved' && (
                     <>
-                        <button className={styles['rounded-box']}>
+                        <button className={styles['rounded-box-is-active']}>
                             Mark as In Progress
                         </button>
                     </>
@@ -94,7 +105,7 @@ export function RequestOption({selectedRequest} : selectedReqOnly) {
 
                 {selectedRequest.Status === 'In Progress' && (
                     <>
-                        <button className={styles['rounded-box']}>
+                        <button className={styles['rounded-box-is-active']}>
                             Confirm Delivered
                         </button>
                     </>

@@ -84,7 +84,18 @@ export function Requests({selectedFilter, selectedDevice, onDeviceSelect, select
                                             {request.datetime.toTimeString()}
                                         </td>
 
-                                        <td>{request.Status}</td>
+                                        <td>
+                                            <span
+                                                className={
+                                                request.Status == "Requested"? styles.requestedBG : 
+                                                    (request.Status == "Approved"? styles.approvedBG : 
+                                                        (request.Status == "In Progress"? styles.progressBG : 
+                                                            (request.Status == "Delivered"? styles.approvedBG : styles.normalBG))) 
+                                                }
+                                            >
+                                            {request.Status}
+                                            </span>
+                                        </td>
                                     </tr>
                                 )
                             })
