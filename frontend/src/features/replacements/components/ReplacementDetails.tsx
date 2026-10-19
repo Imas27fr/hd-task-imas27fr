@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/hooks/useAuth'
 import styles from './ReplacementDesign.module.css'
-import {type Verdict, type Device, type State, type Request, getFaultyDevices, getRequests} from '../hooks/useDevices'
+import {type Verdict, type Device, type State, type Request, updateStatus, getFaultyDevices, getRequests} from '../hooks/useDevices'
 
 
 type selectedReq = {
@@ -22,7 +20,7 @@ export function RequestDetail({selectedDevice, selectedRequest} : selectedReq) {
                             selectedRequest?.Status == "Requested"? styles.requestedBG : 
                                 (selectedRequest?.Status == "Approved"? styles.approvedBG : 
                                     (selectedRequest?.Status == "In Progress"? styles.progressBG : 
-                                        (selectedRequest?.Status == "Delivered"? styles.approvedBG : styles.normalBG))) 
+                                        (selectedRequest?.Status == "Delivered"? styles.deliveredBG : styles.normalBG))) 
                             }
                         >
                         {selectedRequest?.Status}
@@ -85,7 +83,7 @@ export function RequestOption({selectedRequest} : selectedReqOnly) {
             <div className={styles['requestOptions']}>
                 {selectedRequest.Status === 'Requested' && (
                     <>
-                        <button className={styles['rounded-box-is-active']}>
+                        <button className={styles['rounded-box-is-active']} onClick={() => updateStatus(selectedRequest.DeviceID, "Approved")}>
                             Approve request
                         </button>
 
@@ -97,7 +95,7 @@ export function RequestOption({selectedRequest} : selectedReqOnly) {
 
                 {selectedRequest.Status === 'Approved' && (
                     <>
-                        <button className={styles['rounded-box-is-active']}>
+                        <button className={styles['rounded-box-is-active']} onClick={() => updateStatus(selectedRequest.DeviceID, "In Progress")}>
                             Mark as In Progress
                         </button>
                     </>
@@ -105,7 +103,7 @@ export function RequestOption({selectedRequest} : selectedReqOnly) {
 
                 {selectedRequest.Status === 'In Progress' && (
                     <>
-                        <button className={styles['rounded-box-is-active']}>
+                        <button className={styles['rounded-box-is-active']} onClick={() => updateStatus(selectedRequest.DeviceID, "Delivered")}>
                             Confirm Delivered
                         </button>
                     </>
