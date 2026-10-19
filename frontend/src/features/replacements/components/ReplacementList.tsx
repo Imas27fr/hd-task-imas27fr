@@ -46,8 +46,13 @@ export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devic
 
                                             <td>
                                                 {request.datetime.toDateString()}
-                                                {' '}
-                                                {request.datetime.toTimeString()}
+                                                {' at '}
+                                                {request.datetime.toLocaleTimeString('en-AU', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    hour12: false,
+                                                    timeZone: 'Australia/Sydney'
+                                                })}
                                             </td>
 
                                             <td>

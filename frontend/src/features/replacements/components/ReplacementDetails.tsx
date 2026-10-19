@@ -30,7 +30,7 @@ export function RequestDetail({selectedDevice, selectedRequest} : selectedReq) {
                 <h3 className={styles.deviceID}>Pendant {selectedDevice?.DeviceID}</h3>
                 <p><b>Location:</b> {selectedDevice?.location}</p>
                 <p><b>Recorded fault:</b> {selectedDevice?.faultVerdict}</p>
-                <p><b>Offline since:</b> {selectedDevice?.datetime.toDateString()} {selectedDevice?.datetime.toTimeString()}</p>
+                <p><b>Offline since:</b> {selectedDevice?.datetime.toDateString()} {selectedDevice?.datetime.toLocaleTimeString('en-AU', {hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Australia/Sydney'})}</p>
                 <br></br>
                 <h4 className={styles.replacementProgress}>Replacement progress</h4>
 
