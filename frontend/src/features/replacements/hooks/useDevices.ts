@@ -1,6 +1,7 @@
 
 import { getClientDb } from '@/lib/firebase/client'
-import { doc, getDoc, collection, getDocs, query, where, Timestamp, QuerySnapshot, DocumentData } from 'firebase/firestore'
+import { doc, setDoc, getDoc, collection, getDocs, query, where, Timestamp, QuerySnapshot, DocumentData } from 'firebase/firestore'
+import { Request } from '../components/ReplacementDesign';
 
 
 type Verdict = "Device fault" | "Network Outage" 
@@ -12,7 +13,50 @@ type Device = {
     location: string
 };
 
+type State = "Requested" | "Approved" | "In Progress" | "Delivered" | "Rejected";
+
+type Request = {
+    DeviceID: string,
+    datetime: Date,
+    Status: State
+}
+
 const db = getClientDb()
+
+
+export async function createReplacementRequests(){
+
+    const requests = collection(db, 'requests')
+    const faultyDevices = await getFaultyDevices();
+    console.log("Creating Replacement Requests")
+
+    for (const device of faultyDevices) {
+        console.log(device.DeviceID)
+        
+        const requestRef = doc(db, 'requests', device.DeviceID)
+        const requestSnapshot = await getDoc(requestRef)
+
+        if (requestSnapshot.exists()) {
+            continue;
+        }
+
+        const now: Date = new Date();
+
+        const newRequest: Request = {
+            DeviceID: device.DeviceID,
+            datetime: now,
+            Status: "Requested"
+        }
+
+        await setDoc(doc(requests, newRequest.DeviceID), newRequest)
+
+    }
+
+    console.log(requests)
+
+    return;
+
+}
 
 export async function getFaultyDevices(): Promise<Device[]> {
 
@@ -71,3 +115,4 @@ function getValidDevices(snapshot: QuerySnapshot<DocumentData>): Device[] {
 
     return validDevices;
 }
+
