@@ -61,7 +61,8 @@ export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devic
                                                     request.Status == "Requested"? styles.requestedBG : 
                                                         (request.Status == "Approved"? styles.approvedBG : 
                                                             (request.Status == "In Progress"? styles.progressBG : 
-                                                                (request.Status == "Delivered"? styles.deliveredBG : styles.normalBG))) 
+                                                                (request.Status == "Delivered"? styles.deliveredBG : 
+                                                                    (request.Status == "Rejected"? styles.rejectedBG : styles.normalBG)))) 
                                                     }
                                                 >
                                                 {request.Status}

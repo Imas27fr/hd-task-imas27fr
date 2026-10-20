@@ -106,6 +106,7 @@ export default function Replacement() {
             />
 
             <RequestDetail 
+            key={selectedDevice?.DeviceID ?? 'none'}
             selectedDevice={selectedDevice}
             selectedRequest={selectedRequest}
             />

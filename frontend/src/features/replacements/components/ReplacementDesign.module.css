@@ -192,3 +192,28 @@
     color: #225C2C;
     background-color: #E4F2E5;  
 }
+
+.rejectedBG {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    color: #812E2A;
+    background-color: #FAE6E5;  
+}
+
+.tablediv {
+    overflow-y: scroll;
+    width: 100%;
+}
+
+.textbox {
+    border: 1px solid black;
+    width: 100%;
+}
+
+.rejectOptions {
+    padding-top: 30px;
+    display: flex;
+    justify-content: center; 
+    align-items: center;     
+    gap: 1rem;        
+}
