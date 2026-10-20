@@ -125,6 +125,13 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
                     </>
                 )}
 
+            {selectedRequest.Status === 'Approved' && (
+                    <>
+                        <br></br>
+                        <div className={styles.approvedMsg}>Request approved and saved.</div>
+                    </>
+                )}
+
             <div className={styles['requestOptions']}>
                 {selectedRequest.Status === 'Requested' && (
                     <>
