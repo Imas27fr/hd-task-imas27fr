@@ -208,6 +208,13 @@
 .textbox {
     border: 1px solid black;
     width: 100%;
+    padding: 10px;
+}
+
+.textboxError {
+    border: 1px solid #8F302B;
+    width: 100%;
+    padding: 10px;
 }
 
 .rejectOptions {
@@ -216,4 +223,29 @@
     justify-content: center; 
     align-items: center;     
     gap: 1rem;        
+}
+
+.rejectionError {
+    color: #8F302B;
+}
+
+.rejectionReason {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid #E4C5C1;
+    background-color: #FAE6E5;  
+}
+
+.rejectionReason h2 {
+    padding: 10px;
+    font-weight: bold;
+}
+
+.rejectionReason p {
+    padding: 10px;
+}
+
+.rejecth2 {
+    font-weight: bold;
+    font-size: larger;
 }

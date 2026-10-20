@@ -37,10 +37,10 @@ export function RequestDetail({selectedDevice, selectedRequest} : selectedReq) {
                 <p><b>Recorded fault:</b> {selectedDevice?.faultVerdict}</p>
                 <p><b>Offline since:</b> {selectedDevice?.datetime.toDateString()} {selectedDevice?.datetime.toLocaleTimeString('en-AU', {hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Australia/Sydney'})}</p>
                 <br></br>
-                <h4 className={styles.replacementProgress}>Replacement progress</h4>
 
                 <ProgressBar 
                 selectedRequest={selectedRequest}
+                isRejecting={isRejecting}
                 />
 
                 {isRejecting === false && (
@@ -66,19 +66,22 @@ export function RequestDetail({selectedDevice, selectedRequest} : selectedReq) {
 
 type selectedReqOnly = {
     selectedRequest: Request | null,
+    isRejecting: boolean
 }
 
-export function ProgressBar({selectedRequest} : selectedReqOnly) {
+export function ProgressBar({selectedRequest, isRejecting} : selectedReqOnly) {
 
     const stages = ['Requested', 'Approved', 'In Progress', 'Delivered']
 
     const currentStep = stages.indexOf(selectedRequest?.Status ?? '')
-    if (selectedRequest?.Status === "Rejected") {
+    if (selectedRequest?.Status === "Rejected" || isRejecting) {
         return;
     }
 
     return (
         <>
+            <h4 className={styles.replacementProgress}>Replacement progress</h4>
+
             <div className={styles.steps}>
                 <div className={currentStep >= 0 ? styles['stepFilled'] : styles['step']}></div>
                 <div className={currentStep >= 1 ? styles['stepFilled'] : styles['step']}></div>
@@ -110,8 +113,15 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
             {selectedRequest.Status === 'Rejected' && (
                     <>
                         <br></br>
-                        <p>Reason for Rejection:</p>
-                        <p>{selectedRequest.Reason}</p>
+                        <div className={styles.rejectionReason}>
+                            <h2>Rejection Reason</h2>
+                            <p>{selectedRequest.Reason}</p>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <p>This request is closed. No further progress actions are available.</p>
+
                     </>
                 )}
 
@@ -159,6 +169,8 @@ type selectedReqandRejectReason = {
 }
 
 export function RejectReasonOption({selectedRequest, setIsRejecting, reason, setReason} : selectedReqandRejectReason) {
+    const [text,setText] = useState("");
+
 
     if (!selectedRequest) return null
 
@@ -181,17 +193,18 @@ export function RejectReasonOption({selectedRequest, setIsRejecting, reason, set
 
     return (
         <>
-            <br></br>
-            <label htmlFor="rejection-reason">Reason for rejection</label>
+            <h2 className={styles.rejecth2}>Reject replacement request</h2>
+            <label htmlFor="rejection-reason">Reason for rejection (required)</label>
             <br></br>
             <textarea
                 id="rejection-reason"
                 value={reason}
-                onChange={event => setReason(event.target.value)}
+                onChange={event => {setReason(event.target.value); setText(event.target.value)}}
                 rows={3}
-                placeholder="Explain why this request is being rejected"
-                className={styles.textbox}
+                placeholder="Enter the reason for your decision"
+                className={text.trim() !== ""? styles.textbox : styles.textboxError}
             />
+            { text.trim() === "" && <p className={styles.rejectionError}>Enter a reason before rejecting</p> }
 
             {selectedRequest.Status === 'Requested' && (
                     <>
