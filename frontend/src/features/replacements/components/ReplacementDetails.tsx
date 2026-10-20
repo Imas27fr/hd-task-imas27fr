@@ -89,10 +89,10 @@ export function ProgressBar({selectedRequest, isRejecting} : selectedReqOnly) {
                 <div className={currentStep >= 3 ? styles['stepFilled'] : styles['step']}></div>
             </div>
             <div className={styles.stepsLabel}>
-                <p>Requested</p>
-                <p>Approved</p>
-                <p>In Progress</p>
-                <p>Delivered</p>
+                <p style={{fontWeight: currentStep === 0 ? 'bold' : 'normal'}}>Requested</p>
+                <p style={{fontWeight: currentStep === 1 ? 'bold' : 'normal'}}>Approved</p>
+                <p style={{fontWeight: currentStep === 2 ? 'bold' : 'normal'}}>In Progress</p>
+                <p style={{fontWeight: currentStep === 3 ? 'bold' : 'normal'}}>Delivered</p>
             </div>
         </>
     )
@@ -132,6 +132,20 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
                     </>
                 )}
 
+            {selectedRequest.Status === 'In Progress' && (
+                    <>  
+                        <br></br>
+                        <p>Replacement arrangements are underway. Confirm delivery before completing.</p>
+                    </>
+                )}
+
+            {selectedRequest.Status === 'Delivered' && (
+                    <>
+                        <br></br>
+                        <div className={styles.approvedMsg}>Delivery confirmed by the coordinator. Request completed.</div>
+                    </>
+                )}
+
             <div className={styles['requestOptions']}>
                 {selectedRequest.Status === 'Requested' && (
                     <>
@@ -155,7 +169,7 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
                 )}
 
                 {selectedRequest.Status === 'In Progress' && (
-                    <>
+                    <>  
                         <button className={styles['rounded-box-is-active']} onClick={() => updateStatus(selectedRequest.DeviceID, "Delivered")}>
                             Confirm Delivered
                         </button>

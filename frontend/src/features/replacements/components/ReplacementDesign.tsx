@@ -103,6 +103,7 @@ export default function Replacement() {
             onRequestSelect={setSelectedRequest}
             devices={devices}
             visibleRequests={visibleRequests}
+            selectedRequest={selectedRequest}
             />
 
             <RequestDetail 

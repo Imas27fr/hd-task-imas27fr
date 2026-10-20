@@ -6,11 +6,12 @@ type selected = {
     onDeviceSelect: (device: Device | null) => void,
     onRequestSelect: (request: Request) => void,
     devices: Device [],
-    visibleRequests: Request []
+    visibleRequests: Request [],
+    selectedRequest: Request | null,
 }
 
 
-export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devices, visibleRequests} : selected) {
+export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devices, visibleRequests, selectedRequest} : selected) {
 
     return (
         <>
@@ -37,9 +38,9 @@ export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devic
                                     )
 
                                     return (
-                                        <tr key={request.DeviceID}>
+                                        <tr key={request.DeviceID} style={{backgroundColor: selectedRequest?.DeviceID === request.DeviceID? "#E8F1F8": "white"}}>
                                             <td>
-                                                <button className={styles.requestlistoption} onClick={() => {onRequestSelect(request); onDeviceSelect(device ?? null)}}>
+                                                <button className={styles.requestlistoption} style={{fontWeight: selectedRequest?.DeviceID === request.DeviceID? "bold": "normal"}} onClick={() => {onRequestSelect(request); onDeviceSelect(device ?? null)}}>
                                                     {request.DeviceID}
                                                 </button>
                                             </td>
