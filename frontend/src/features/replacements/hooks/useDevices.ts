@@ -14,17 +14,31 @@ export type Device = {
 
 export type State = "Requested" | "Approved" | "In Progress" | "Delivered" | "Rejected";
 
-export type Request = {
-    DeviceID: string,
-    datetime: Date,
-    Status: State
-}
+export type Request =
+    | {
+        DeviceID: string
+        datetime: Date
+        Status: Exclude<State, 'Rejected'>
+    }
+    | {
+        DeviceID: string
+        datetime: Date
+        Status: 'Rejected'
+        Reason: string
+    }
 
 const db = getClientDb()
 
 export async function updateStatus(deviceID: string, Status: State): Promise<void> {
 
     await updateDoc(doc(db, "requests", deviceID), { Status });
+    console.log("updated")
+
+}
+
+export async function setRejected(deviceID: string, Status: State, Reason: string): Promise<void> {
+
+    await updateDoc(doc(db, "requests", deviceID), { Status, Reason});
     console.log("updated")
 
 }
@@ -69,15 +83,32 @@ export function getValidRequests(snapshot: QuerySnapshot<DocumentData>): Request
         }
         const status = request.Status;
 
+        let validRequest: Request
 
-        const validRequest : Request = {
-            DeviceID: deviceID,
-            datetime: date,
-            Status: status
+        if (status !== 'Rejected') {
+            validRequest = {
+                DeviceID: deviceID,
+                datetime: date,
+                Status: status
+            }
+        }
+        else {
+            if (typeof request.Reason !== "string") {
+                console.log("Invalid Reason Type")
+                continue
+            }
+            else {
+                const reason = request.Reason
+                validRequest = {
+                    DeviceID: deviceID,
+                    datetime: date,
+                    Status: status,
+                    Reason: reason
+                }
+            }
         }
 
         validRequests.push(validRequest);
-
     }
 
     return validRequests;
