@@ -6,22 +6,26 @@ import { useState } from 'react'
 type selectedReq = {
     selectedDevice: Device | null,
     selectedRequest: Request | null,
+    isDbError: boolean
 }
 
-export function RequestDetail({selectedDevice, selectedRequest} : selectedReq) {
+export function RequestDetail({selectedDevice, selectedRequest, isDbError} : selectedReq) {
 
     const [isRejecting, setIsRejecting] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
 
-    if (selectedDevice === null) {
+    if (isDbError || selectedDevice === null) {
         return (
             <>
                 <div className={styles['requestInfoBox']}>
                     <div className={styles.requestHeader}>
                         <h2 className={styles.requestID}>Request Information</h2>
                     </div>
-                        <p className={styles.selectReqMsg}>Select a request to view its details</p>
-                    
+                        <p className={styles.selectReqMsg}>
+                            {isDbError
+                                ? 'Request details are unavailable until requests can be loaded.'
+                                : 'Select a request to view its details'}
+                        </p>
                 </div>
             </>
         )
@@ -118,8 +122,22 @@ type selectedReqandReject = {
 }
 
 export function RequestOption({selectedRequest, onRejectSelect} : selectedReqandReject) {
+    const [saveError, setSaveError] = useState<string | null>(null)
 
     if (!selectedRequest) return null
+
+    async function handleStatusChange(nextStatus: State) {
+        if (!selectedRequest) return
+
+        setSaveError(null)
+
+        try {
+            await updateStatus(selectedRequest.DeviceID, nextStatus)
+        } catch (error) {
+            setSaveError('Could not save the change. Please try again.')
+            console.error('Status update failed:', error)
+        }
+    }
 
     return (
         <>      
@@ -161,9 +179,15 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
                 )}
 
             <div className={styles['requestOptions']}>
+                {saveError && (
+                    <p role="alert" className={styles.rejectionError}>
+                        {saveError}
+                    </p>
+                )}
+
                 {selectedRequest.Status === 'Requested' && (
                     <>
-                        <button className={styles['rounded-box-is-active']} onClick={() => updateStatus(selectedRequest.DeviceID, "Approved")}>
+                        <button className={styles['rounded-box-is-active']} onClick={() => handleStatusChange('Approved')}>
                             Approve request
                         </button>
 
@@ -176,7 +200,7 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
 
                 {selectedRequest.Status === 'Approved' && (
                     <>
-                        <button className={styles['rounded-box-is-active']} onClick={() => updateStatus(selectedRequest.DeviceID, "In Progress")}>
+                        <button className={styles['rounded-box-is-active']} onClick={() => handleStatusChange('In Progress')}>
                             Mark as In Progress
                         </button>
                     </>
@@ -184,7 +208,7 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
 
                 {selectedRequest.Status === 'In Progress' && (
                     <>  
-                        <button className={styles['rounded-box-is-active']} onClick={() => updateStatus(selectedRequest.DeviceID, "Delivered")}>
+                        <button className={styles['rounded-box-is-active']} onClick={() => handleStatusChange('Delivered')}>
                             Confirm Delivered
                         </button>
                     </>
@@ -205,14 +229,17 @@ type selectedReqandRejectReason = {
 
 export function RejectReasonOption({selectedRequest, setIsRejecting, reason, setReason} : selectedReqandRejectReason) {
     const [text,setText] = useState("");
+    const [saveError, setSaveError] = useState<string | null>(null)
 
 
     if (!selectedRequest) return null
 
     async function handleReject() {
         if (!selectedRequest || reason.trim().length === 0) return
+        setSaveError(null)
 
         try {
+
             await setRejected(
                 selectedRequest.DeviceID,
                 'Rejected',
@@ -222,6 +249,7 @@ export function RejectReasonOption({selectedRequest, setIsRejecting, reason, set
             setReason('')
             setIsRejecting(false)
         } catch (error) {
+            setSaveError('Could not save the rejection. Please try again.')
             console.error('Rejection could not be saved:', error)
         }
     }
@@ -240,6 +268,12 @@ export function RejectReasonOption({selectedRequest, setIsRejecting, reason, set
                 className={text.trim() !== ""? styles.textbox : styles.textboxError}
             />
             { text.trim() === "" && <p className={styles.rejectionError}>Enter a reason before rejecting</p> }
+
+            {saveError && (
+                <p role="alert" className={styles.rejectionError}>
+                    {saveError}
+                </p>
+            )}
 
             {selectedRequest.Status === 'Requested' && (
                     <>

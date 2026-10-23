@@ -127,6 +127,7 @@ export default function Replacement() {
                 key={selectedDevice?.DeviceID ?? 'none'}
                 selectedDevice={selectedDevice}
                 selectedRequest={selectedRequest}
+                isDbError={isDbError}
                 />
             </div>
         }

@@ -21,7 +21,7 @@ export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devic
                 
                 {isDbError ? (
                     <div role="alert" className={styles.selectReqMsg}>
-                        <p className={styles.rejectionError}>
+                        <p className={`${styles.rejectionError} ${styles.loadError}`}>
                             Could not load replacement requests.<br />
                             <button className={styles['rounded-box']} onClick={() => window.location.reload()}>Retry</button>
                         </p>
