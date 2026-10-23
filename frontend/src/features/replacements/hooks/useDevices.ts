@@ -1,6 +1,6 @@
 
 import { getClientDb } from '@/lib/firebase/client'
-import { doc, setDoc, getDoc, collection, getDocs, updateDoc, query, where, Timestamp, QuerySnapshot, DocumentData } from 'firebase/firestore'
+import { doc, setDoc, getDoc, collection, updateDoc, Timestamp, type QuerySnapshot, type DocumentData } from 'firebase/firestore'
 
 
 export type Verdict = "Device fault" | "Network Outage" 
@@ -32,29 +32,15 @@ const db = getClientDb()
 export async function updateStatus(deviceID: string, Status: State): Promise<void> {
 
     await updateDoc(doc(db, "requests", deviceID), { Status });
-    console.log("updated")
 
 }
 
 export async function setRejected(deviceID: string, Status: State, Reason: string): Promise<void> {
 
     await updateDoc(doc(db, "requests", deviceID), { Status, Reason});
-    console.log("updated")
 
 }
 
-export async function getRequests(): Promise<Request[]> {
-
-    await createReplacementRequests();
-
-    const queryResults = query(
-        collection(db, "requests")
-    );
-
-    const snapshot = await getDocs(queryResults);
-
-    return getValidRequests(snapshot);
-}
 
 export function getValidRequests(snapshot: QuerySnapshot<DocumentData>): Request[] {
 
@@ -117,14 +103,11 @@ export function getValidRequests(snapshot: QuerySnapshot<DocumentData>): Request
 
 
 
-export async function createReplacementRequests(){
+export async function createReplacementRequests(faultyDevices: Device[]){
 
     const requests = collection(db, 'requests')
-    const faultyDevices = await getFaultyDevices();
-    console.log("Creating Replacement Requests")
 
     for (const device of faultyDevices) {
-        console.log(device.DeviceID)
         
         const requestRef = doc(db, 'requests', device.DeviceID)
         const requestSnapshot = await getDoc(requestRef)
@@ -145,25 +128,9 @@ export async function createReplacementRequests(){
 
     }
 
-    console.log(requests)
-
-    return;
-
 }
 
-export async function getFaultyDevices(): Promise<Device[]> {
-
-    const faultyDevices= query(
-        collection(db, "devices"),
-        where("faultVerdict", "==", "Device fault")
-    );
-
-    const snapshot = await getDocs(faultyDevices);
-
-    return getValidDevices(snapshot);
-}
-
-function getValidDevices(snapshot: QuerySnapshot<DocumentData>): Device[] {
+export function getValidDevices(snapshot: QuerySnapshot<DocumentData>): Device[] {
 
     const documents = snapshot.docs;
     const validDevices: Device[] = [];

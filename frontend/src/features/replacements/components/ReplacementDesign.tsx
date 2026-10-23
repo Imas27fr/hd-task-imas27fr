@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import { collection, onSnapshot } from 'firebase/firestore'
+import { collection, onSnapshot, type QuerySnapshot, type DocumentData } from 'firebase/firestore'
 import styles from './ReplacementDesign.module.css'
 import {Filters} from './ReplacementFilters'
 import {Requests} from './ReplacementList'
-import {RequestDetail, RequestOption,  ProgressBar} from './ReplacementDetails'
-import {type Verdict, type Device, type State, type Request, getFaultyDevices, getRequests, getValidRequests} from '../hooks/useDevices'
+import {RequestDetail} from './ReplacementDetails'
+import { type Device, type Request, getValidRequests, createReplacementRequests, getValidDevices} from '../hooks/useDevices'
 import { getClientDb } from '@/lib/firebase/client'
 
 export default function Replacement() {
@@ -17,21 +17,28 @@ export default function Replacement() {
     const [requests, setRequests] = useState<Request[]>([])
     const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
     const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
+
     const [requestsLoading, setRequestsLoading] = useState(true)
-    const [isDbError, setisDbError] = useState(false)
+    const [devicesLoading, setDevicesLoading] = useState(true)
+    const isLoading = requestsLoading || devicesLoading
+
+    const [requestsError, setRequestsError] = useState(false)
+    const [devicesError, setDevicesError] = useState(false)
+    const isDbError = requestsError || devicesError
+
     const { user, loading } = useAuth()
 
-    async function loadDevicesRequests() {
+    async function loadDevicesRequests(snapshot: QuerySnapshot<DocumentData>) {
             try {
-                const loadedDevices = await getFaultyDevices()
-                const loadedRequests = await getRequests()
+                const loadedDevices = getValidDevices(snapshot)
+                const filteredDevices = loadedDevices.filter(device => device.faultVerdict === "Device fault")
+                await createReplacementRequests(filteredDevices);
                 setDevices(loadedDevices)
-                setRequests(loadedRequests)
-                setisDbError(false)
-                setRequestsLoading(false)
+                setDevicesError(false)
+                setDevicesLoading(false)
             } catch (error) {
-                setisDbError(true)
-                setRequestsLoading(false)
+                setDevicesError(true)
+                setDevicesLoading(false)
                 console.error('Failed to load devices and requests:', error)
             }
         }
@@ -45,9 +52,9 @@ export default function Replacement() {
             (snapshot) => {
 
                 const updatedRequests: Request [] = getValidRequests(snapshot);
-
-                loadDevicesRequests()
-                
+                setRequests(updatedRequests)
+                setRequestsError(false)
+                setRequestsLoading(false)
                 setSelectedRequest(currentRequest => {
                     if (!currentRequest) return null
 
@@ -58,7 +65,7 @@ export default function Replacement() {
             },
 
             (error) => {
-                setisDbError(true)
+                setRequestsError(true)
                 setRequestsLoading(false)
                 console.error('Could not listen to requests db:', error)
             }
@@ -74,14 +81,12 @@ export default function Replacement() {
         const unsubscribe = onSnapshot(collection(getClientDb(), "devices"),
 
             (snapshot) => {
-
-                loadDevicesRequests()
-                
+                loadDevicesRequests(snapshot)
             },
 
             (error) => {
-                setisDbError(true)
-                setRequestsLoading(false)
+                setDevicesError(true)
+                setDevicesLoading(false)
                 console.error('Could not listen to devices db:', error)
             }
 
@@ -105,13 +110,13 @@ export default function Replacement() {
             onSelect={setSelectedFilter}
         />
 
-        {requestsLoading && 
+        {isLoading && 
             <div className={styles.loading}>
                 <p>Loading requests...</p>
             </div>
         }
 
-        {!requestsLoading &&
+        {!isLoading &&
             <div className={styles.parentBody}>
                 <Requests 
                 selectedFilter={selectedFilter}
