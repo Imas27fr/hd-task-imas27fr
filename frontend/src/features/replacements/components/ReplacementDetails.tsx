@@ -149,9 +149,6 @@ export function RequestOption({selectedRequest, onRejectSelect} : selectedReqand
                             <h2>Rejection Reason</h2>
                             <p>{selectedRequest.Reason}</p>
                         </div>
-                        <br></br>
-                        <br></br>
-                        <br></br>
                         <p>This request is closed. No further progress actions are available.</p>
 
                     </>
@@ -228,7 +225,6 @@ type selectedReqandRejectReason = {
 }
 
 export function RejectReasonOption({selectedRequest, setIsRejecting, reason, setReason} : selectedReqandRejectReason) {
-    const [text,setText] = useState("");
     const [saveError, setSaveError] = useState<string | null>(null)
 
 
@@ -262,12 +258,12 @@ export function RejectReasonOption({selectedRequest, setIsRejecting, reason, set
             <textarea
                 id="rejection-reason"
                 value={reason}
-                onChange={event => {setReason(event.target.value); setText(event.target.value)}}
+                onChange={event => {setReason(event.target.value)}}
                 rows={3}
                 placeholder="Enter the reason for your decision"
-                className={text.trim() !== ""? styles.textbox : styles.textboxError}
+                className={reason.trim() !== ""? styles.textbox : styles.textboxError}
             />
-            { text.trim() === "" && <p className={styles.rejectionError}>Enter a reason before rejecting</p> }
+            { reason.trim() === "" && <p className={styles.rejectionError}>Enter a reason before rejecting</p> }
 
             {saveError && (
                 <p role="alert" className={styles.rejectionError}>
@@ -282,7 +278,7 @@ export function RejectReasonOption({selectedRequest, setIsRejecting, reason, set
                                 Confirm Rejection
                             </button>
 
-                            <button className={styles['rounded-box']} onClick={() => setIsRejecting(false)}>
+                            <button className={styles['rounded-box']} onClick={() => {setIsRejecting(false); setReason("")}}>
                                 Cancel
                             </button>
                         </div>
