@@ -20,9 +20,18 @@ export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devic
                 <h2 className={styles.heading2}>Replacement Requests</h2>
                 
                 {isDbError ? (
-                    <p role="alert" className={`${styles.selectReqMsg} ${styles.rejectionError}`}>
-                        Could not load replacement requests. Refresh the page to try again.
-                    </p>
+                    <div role="alert" className={styles.selectReqMsg}>
+                        <p className={styles.rejectionError}>
+                            Could not load replacement requests.<br />
+                            <button className={styles['rounded-box']} onClick={() => window.location.reload()}>Retry</button>
+                        </p>
+                    </div>
+                ) : visibleRequests.length === 0 ? (
+                    <div className={styles.selectReqMsg}>
+                        <p>No Replacement Requests Found<br />
+                            {selectedFilter === 'All' ? 'Requests appear automatically when a recorded device fault is detected.' : 'Try another status filter.'}
+                        </p>
+                    </div>
                 ) : (
                 <div className={styles.tablediv}>
                     <table className={styles.requestsTable}>
