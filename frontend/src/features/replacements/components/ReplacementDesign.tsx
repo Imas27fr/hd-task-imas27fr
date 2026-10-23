@@ -32,8 +32,23 @@ export default function Replacement() {
             try {
                 const loadedDevices = getValidDevices(snapshot)
                 const filteredDevices = loadedDevices.filter(device => device.faultVerdict === "Device fault")
-                await createReplacementRequests(filteredDevices);
+
+                // Update the selected device incase that device details have been updated.
+                setSelectedDevice(currentDevice => {
+                    if (!currentDevice) return null
+
+                    return loadedDevices.find(
+                        device => device.DeviceID === currentDevice.DeviceID
+                    ) ?? null
+                })
+
+                // Update the Devices List
                 setDevices(loadedDevices)
+
+                // Create new Requests automatically.
+                await createReplacementRequests(filteredDevices);
+
+                // set Error detection to false
                 setDevicesError(false)
                 setDevicesLoading(false)
             } catch (error) {
