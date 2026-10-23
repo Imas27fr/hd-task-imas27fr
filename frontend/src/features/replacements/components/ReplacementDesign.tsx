@@ -17,7 +17,8 @@ export default function Replacement() {
     const [requests, setRequests] = useState<Request[]>([])
     const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
     const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
-
+    const [requestsLoading, setRequestsLoading] = useState(true)
+    const [isDbError, setisDbError] = useState(false)
     const { user, loading } = useAuth()
 
     async function loadDevicesRequests() {
@@ -26,7 +27,11 @@ export default function Replacement() {
                 const loadedRequests = await getRequests()
                 setDevices(loadedDevices)
                 setRequests(loadedRequests)
+                setisDbError(false)
+                setRequestsLoading(false)
             } catch (error) {
+                setisDbError(true)
+                setRequestsLoading(false)
                 console.error('Failed to load devices and requests:', error)
             }
         }
@@ -53,6 +58,8 @@ export default function Replacement() {
             },
 
             (error) => {
+                setisDbError(true)
+                setRequestsLoading(false)
                 console.error('Could not listen to requests db:', error)
             }
 
@@ -73,6 +80,8 @@ export default function Replacement() {
             },
 
             (error) => {
+                setisDbError(true)
+                setRequestsLoading(false)
                 console.error('Could not listen to devices db:', error)
             }
 
@@ -96,22 +105,31 @@ export default function Replacement() {
             onSelect={setSelectedFilter}
         />
 
-        <div className={styles.parentBody}>
-            <Requests 
-            selectedFilter={selectedFilter}
-            onDeviceSelect={setSelectedDevice}
-            onRequestSelect={setSelectedRequest}
-            devices={devices}
-            visibleRequests={visibleRequests}
-            selectedRequest={selectedRequest}
-            />
+        {requestsLoading && 
+            <div className={styles.loading}>
+                <p>Loading requests...</p>
+            </div>
+        }
 
-            <RequestDetail 
-            key={selectedDevice?.DeviceID ?? 'none'}
-            selectedDevice={selectedDevice}
-            selectedRequest={selectedRequest}
-            />
-        </div>
+        {!requestsLoading &&
+            <div className={styles.parentBody}>
+                <Requests 
+                selectedFilter={selectedFilter}
+                onDeviceSelect={setSelectedDevice}
+                onRequestSelect={setSelectedRequest}
+                devices={devices}
+                visibleRequests={visibleRequests}
+                selectedRequest={selectedRequest}
+                isDbError={isDbError}
+                />
+
+                <RequestDetail 
+                key={selectedDevice?.DeviceID ?? 'none'}
+                selectedDevice={selectedDevice}
+                selectedRequest={selectedRequest}
+                />
+            </div>
+        }
 
 
         </main>

@@ -258,3 +258,23 @@
     width: 100%;
     border: 1px solid #C3D9C5;
 }
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 500px;
+}
+
+.loading p {
+    font-size: larger;
+}
+
+.selectReqMsg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 75%;
+}

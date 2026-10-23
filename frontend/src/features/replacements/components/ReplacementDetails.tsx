@@ -13,6 +13,20 @@ export function RequestDetail({selectedDevice, selectedRequest} : selectedReq) {
     const [isRejecting, setIsRejecting] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
 
+    if (selectedDevice === null) {
+        return (
+            <>
+                <div className={styles['requestInfoBox']}>
+                    <div className={styles.requestHeader}>
+                        <h2 className={styles.requestID}>Request Information</h2>
+                    </div>
+                        <p className={styles.selectReqMsg}>Select a request to view its details</p>
+                    
+                </div>
+            </>
+        )
+    }
+
     return (
         <>
             <div className={styles['requestInfoBox']}>

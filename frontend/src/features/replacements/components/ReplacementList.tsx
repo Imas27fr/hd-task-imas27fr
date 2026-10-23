@@ -8,16 +8,22 @@ type selected = {
     devices: Device [],
     visibleRequests: Request [],
     selectedRequest: Request | null,
+    isDbError: boolean,
 }
 
 
-export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devices, visibleRequests, selectedRequest} : selected) {
+export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devices, visibleRequests, selectedRequest, isDbError} : selected) {
 
     return (
         <>
             <div className={styles['requestsBox']}>
                 <h2 className={styles.heading2}>Replacement Requests</h2>
                 
+                {isDbError ? (
+                    <p role="alert" className={`${styles.selectReqMsg} ${styles.rejectionError}`}>
+                        Could not load replacement requests. Refresh the page to try again.
+                    </p>
+                ) : (
                 <div className={styles.tablediv}>
                     <table className={styles.requestsTable}>
                         
@@ -76,6 +82,7 @@ export function Requests({selectedFilter, onDeviceSelect, onRequestSelect, devic
                         </tbody>
                     </table>
                 </div>
+                )}
             </div>
 
         </>
