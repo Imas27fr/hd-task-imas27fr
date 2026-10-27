@@ -1,5 +1,5 @@
 import styles from './ReplacementDesign.module.css'
-import {type Verdict, type Device, type State, type Request, updateStatus, setRejected} from '../hooks/useDevices'
+import {type Device, type State, type Request, updateStatus, setRejected} from '../hooks/useDevices'
 import { useState } from 'react'
 
 

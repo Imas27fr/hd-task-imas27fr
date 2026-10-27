@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/hooks/useAuth'
 import styles from './ReplacementDesign.module.css'
 
 
