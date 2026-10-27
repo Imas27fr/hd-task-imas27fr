@@ -38,7 +38,7 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
       
-      - name: Build
+      - name: Build frontend and backend
         env:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
