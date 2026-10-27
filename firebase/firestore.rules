@@ -56,6 +56,55 @@ service cloud.firestore {
       allow delete: if false; // soft-delete only — set deletedAt field instead
     }
 
+    match /devices/{deviceId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    match /requests/{deviceId} {
+      allow read: if request.auth != null;
+
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll(['DeviceID', 'datetime', 'Status'])
+        && request.resource.data.keys().hasOnly(['DeviceID', 'datetime', 'Status'])
+        && request.resource.data.DeviceID is string
+        && request.resource.data.DeviceID.size() > 0
+        && request.resource.data.DeviceID == deviceId
+        && request.resource.data.datetime is timestamp
+        && request.resource.data.Status == 'Requested'
+        && exists(/databases/$(database)/documents/devices/$(deviceId))
+        && get(/databases/$(database)/documents/devices/$(deviceId)).data.faultVerdict == 'Device fault';
+
+      allow update: if isAuthenticated()
+        && request.resource.data.keys().hasAll(['DeviceID', 'datetime', 'Status'])
+        && request.resource.data.keys().hasOnly(['DeviceID', 'datetime', 'Status', 'Reason'])
+        && request.resource.data.DeviceID is string
+        && request.resource.data.DeviceID == deviceId
+        && request.resource.data.DeviceID == resource.data.DeviceID
+        && request.resource.data.datetime is timestamp
+        && request.resource.data.datetime == resource.data.datetime
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['Status', 'Reason'])
+        && ((resource.data.Status == 'Requested'
+              && request.resource.data.Status in ['Approved', 'Rejected'])
+            || (resource.data.Status == 'Approved'
+              && request.resource.data.Status == 'In Progress')
+            || (resource.data.Status == 'In Progress'
+              && request.resource.data.Status == 'Delivered')
+        )
+        && ((request.resource.data.Status == "Rejected"
+              && request.resource.data.keys().hasAll(['Reason'])
+              && request.resource.data.Reason is string
+              && request.resource.data.Reason.trim().size() > 0
+            )
+            || (request.resource.data.Status != "Rejected"
+              && request.resource.data.keys().hasOnly(['DeviceID', 'datetime', 'Status'])
+            )
+        );
+
+
+      allow delete: if false;
+    }
+
     // Add new collection rules above this comment using the /firebase-collection skill.
 
     // ── Default deny ───────────────────────────────────────────────────────
